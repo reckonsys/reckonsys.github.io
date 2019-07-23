@@ -1,5 +1,5 @@
-from http.server import BaseHTTPRequestHandler
 from socketserver import TCPServer
+from http.server import BaseHTTPRequestHandler
 
 
 class SimpleHTTPHandler(BaseHTTPRequestHandler):

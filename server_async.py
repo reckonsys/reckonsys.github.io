@@ -1,17 +1,34 @@
 import asyncio
 
 
+class AsyncHTTPHandler:
+    '''
+    This is just to mimic the socketserver.TCPServer functionality
+    '''
+    def __init__(self, writer):
+        self.wfile = writer
+
+    def send_response(self, status):
+        self.wfile.write(f'HTTP/1.1 {status} OK\r\n'.encode())
+
+    def send_header(self, header, value):
+        self.wfile.write(f'{header}: {value}\r\n'.encode())
+
+    def end_headers(self):
+        self.wfile.write(b'\r\n\r\n')
+
+    def do_GET(self):
+        body = b'{"foo": "bar"}\r\n'
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', len(body))
+        self.end_headers()
+        self.wfile.write(body)
+
+
 async def handle(reader, writer):
-    body = b'{"foo": "bar"}\r\n'
-    writer.write(b'HTTP/1.1 200 OK\r\n')
-    writer.write(b'Content-Type: application/json\r\n')
-    writer.write(b'Content-Length: %d' % len(body))
-    writer.write(b'\r\n\r\n')
-    writer.write(body)
-    writer.write(b'\r\n\r\n')
-    # await writer.drain()
-    # writer.close()
-    # await writer.wait_closed()
+    handler = AsyncHTTPHandler(writer)
+    handler.do_GET()
 
 
 async def main():
